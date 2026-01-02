@@ -9,7 +9,7 @@ const Card = () => {
       <div className='flex flex-col gap-2 w-full'>
         <div
           className='
-              aspect-square 
+              aspect-square     
               w-full 
               relative 
               overflow-hidden 

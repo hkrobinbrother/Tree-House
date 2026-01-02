@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import useAuth from '../../../hooks/useAuth'
 import avatarImg from '../../../assets/images/placeholder.jpg'
-import logo from '../../../assets/images/logo-flat.png'
+import logo from "../../../../public/logo-square.png"
 const Navbar = () => {
   const { user, logOut } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
@@ -15,8 +15,9 @@ const Navbar = () => {
         <Container>
           <div className='flex flex-row  items-center justify-between gap-3 md:gap-0'>
             {/* Logo */}
-            <Link to='/'>
-              <img src={logo} alt='logo' width='100' height='100' />
+            <Link className='flex items-center gap-2' to='/'>
+              <img src={logo} alt='logo' className='w-12 h-12' />
+              <h1 className='text-2xl font-bold '>Tree House</h1>
             </Link>
             {/* Dropdown Menu */}
             <div className='relative'>
