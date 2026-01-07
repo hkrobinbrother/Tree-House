@@ -11,7 +11,7 @@ import AdminMenu from './Menu/AdminMenu'
 import { Link } from 'react-router-dom'
 import SellerMenu from './Menu/SellerMenu'
 import CustomerMenu from './Menu/CustomerMenu'
-import logo from '../../../assets/images/logo-flat.png'
+import logo from "../../../../public/logo-square.png"
 const Sidebar = () => {
   const { logOut } = useAuth()
   const [isActive, setActive] = useState(false)
@@ -25,15 +25,16 @@ const Sidebar = () => {
       {/* Small Screen Navbar */}
       <div className='bg-gray-100 text-gray-800 flex justify-between md:hidden'>
         <div>
-          <div className='block cursor-pointer p-4 font-bold'>
+          <div className='block cursor-pointer p-4 font-bold '>
             <Link to='/'>
               <img
                 // className='hidden md:block'
-                src='https://i.ibb.co/4ZXzmq5/logo.png'
+                src={logo}
+                className='w-15 h-15'
                 alt='logo'
-                width='100'
-                height='100'
+
               />
+              <h1>Tree House</h1>
             </Link>
           </div>
         </div>
@@ -54,15 +55,19 @@ const Sidebar = () => {
       >
         <div>
           <div>
-            <div className='w-full hidden md:flex px-4 py-2 shadow-lg rounded-lg justify-center items-center bg-lime-100 mx-auto'>
-              <Link to='/'>
+            <div className='w-full hidden md:flex px-4 py-2 shadow-lg rounded-lg justify-center items-center bg-lime-100    mx-auto'>
+              <Link to='/' className='flex items-center'>
                 <img
                   // className='hidden md:block'
                   src={logo}
+                  className='w-10 h-10'
+
                   alt='logo'
                   width='100'
                   height='100'
+                  
                 />
+                <h1 className='font-["Pacifico",cursive]'>Tree House</h1>
               </Link>
             </div>
           </div>

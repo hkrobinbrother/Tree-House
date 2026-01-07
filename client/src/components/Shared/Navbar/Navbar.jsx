@@ -17,7 +17,7 @@ const Navbar = () => {
             {/* Logo */}
             <Link className='flex items-center gap-2' to='/'>
               <img src={logo} alt='logo' className='w-12 h-12' />
-              <h1 className='text-2xl font-bold '>Tree House</h1>
+              <h1 className='text-2xl font-bold font-["Pacifico",cursive]'>Tree House</h1>
             </Link>
             {/* Dropdown Menu */}
             <div className='relative'>
@@ -31,7 +31,7 @@ const Navbar = () => {
                   <div className='hidden md:block'>
                     {/* Avatar */}
                     <img
-                      className='rounded-full'
+                      className='rounded-full h-15 w-15'
                       referrerPolicy='no-referrer'
                       src={user && user.photoURL ? user.photoURL : avatarImg}
                       alt='profile'
