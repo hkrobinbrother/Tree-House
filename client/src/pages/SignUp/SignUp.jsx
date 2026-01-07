@@ -4,6 +4,8 @@ import useAuth from '../../hooks/useAuth'
 import { toast } from 'react-hot-toast'
 import { TbFidgetSpinner } from 'react-icons/tb'
 
+import { imagUpload } from '../../api/utils'
+
 const SignUp = () => {
   const { createUser, updateUserProfile, signInWithGoogle, loading } = useAuth()
   const navigate = useNavigate()
@@ -14,7 +16,17 @@ const SignUp = () => {
     const name = form.name.value
     const email = form.email.value
     const password = form.password.value
+    const image = form.image.files[0]
+    console.log(image)
 
+    
+
+    // send image data to img bb the imageUpload come from utils.js
+    const photoUrl = await imagUpload(image)
+  
+
+    
+    
     try {
       //2. User Registration
       const result = await createUser(email, password)
@@ -22,7 +34,8 @@ const SignUp = () => {
       //3. Save username & profile photo
       await updateUserProfile(
         name,
-        'https://lh3.googleusercontent.com/a/ACg8ocKUMU3XIX-JSUB80Gj_bYIWfYudpibgdwZE1xqmAGxHASgdvCZZ=s96-c'
+       photoUrl
+        
       )
       console.log(result)
 
@@ -142,7 +155,7 @@ const SignUp = () => {
           onClick={handleGoogleSignIn}
           className='flex justify-center items-center space-x-2 border m-3 p-2 border-gray-300 border-rounded cursor-pointer'
         >
-          {/* <FcGoogle size={32} /> */}
+          <FcGoogle size={32} />
 
           <p>Continue with Google</p>
         </div>

@@ -15,7 +15,7 @@ const Card = () => {
               overflow-hidden 
               rounded-xl
             '
-        >
+        >000000000000000000000000000
           <img
             className='
                 object-cover 
