@@ -9,9 +9,10 @@ import toast from "react-hot-toast";
 const AddPlant = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure()
-  const [uploadButtonText,setUploadButtonText] = useState({name:"Upload Button"})
+  const [uploadImage,setUploadImage] = useState({image:{name:"Upload Button"}})
   const [loading,setLoading] = useState(false)
   // handle from submit
+  console.log(uploadImage)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -71,7 +72,7 @@ const AddPlant = () => {
       </Helmet>
 
       {/* Form */}
-      <AddPlantForm handleSubmit={handleSubmit} uploadButtonText={uploadButtonText} setUploadButtonText={setUploadButtonText} loading={loading} />
+      <AddPlantForm handleSubmit={handleSubmit} uploadImage={uploadImage} setUploadImage={setUploadImage} loading={loading} />
     </div>
   );
 };
