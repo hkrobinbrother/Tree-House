@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 const AddPlant = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure()
-  const [uploadImage,setUploadImage] = useState({image:{name:"Upload Button"}})
+  const [uploadImage,setUploadImage] = useState({image:{name:"Upload Button"} })
   const [loading,setLoading] = useState(false)
   // handle from submit
   console.log(uploadImage)
