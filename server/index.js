@@ -52,6 +52,7 @@ async function run() {
     const db = client.db("treeHouse-session")
     const usersCollection = db.collection("users")
     const plantsCollection = db.collection("plants")
+    const ordersCollection = db.collection("orders")
 
     // save or update user in db
 
@@ -120,6 +121,20 @@ async function run() {
       const result = await plantsCollection.findOne(query)
       res.send(result)
     })
+
+    // save order data in db
+     app.post("/orders",verifyToken,async(req,res)=>{
+      const orderInfo = req.body
+      console.log(orderInfo)
+      const result = await ordersCollection.insertOne(orderInfo)
+      res.send(result)
+    })
+
+    // manage plant quantity
+
+
+
+
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 })
     console.log(
