@@ -134,10 +134,15 @@ async function run() {
 
     app.patch("/plants/quantity/:id", verifyToken, async (req, res) => {
       const id = req.params.id
-      const { quantityToUpdate } = req.body
+      const { quantityToUpdate, status } = req.body
       const filter = { _id: new ObjectId(id) }
       let updateDoc = {
         $inc: { quantity: -quantityToUpdate },
+      }
+      if(status === "increase"){
+        updateDoc = {
+          $inc: { quantity: quantityToUpdate },
+        }
       }
       const result = await plantsCollection.updateOne(filter, updateDoc)
       res.send(result)
@@ -195,6 +200,16 @@ async function run() {
       res.send(result)
     })
 
+
+    // cancle/deleted order
+    app.delete("/orders/:id" ,verifyToken,async(req,res)=>{
+      const id = req.params.id
+      const quary = {_id: new ObjectId(id)}
+      const order = await ordersCollection.findOne(quary)
+      if(order.status === "delivered") return res.status(409).send("Cannot cancle onece the product in delivered!")
+      const result = await ordersCollection.deleteOne(quary)
+      res.send(result)
+    })
 
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 })

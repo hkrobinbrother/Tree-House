@@ -11,10 +11,12 @@ import Button from "../Shared/Button/Button";
 import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { useNavigate } from "react-router-dom";
 
-const PurchaseModal = ({ closeModal, isOpen, plant,refetch }) => {
+const PurchaseModal = ({ closeModal, isOpen, plant, refetch }) => {
+  const navigate = useNavigate();
   const { user } = useAuth();
-  const axiosSecure = useAxiosSecure()
+  const axiosSecure = useAxiosSecure();
   const { category, description, image, price, name, seller, quantity, _id } =
     plant;
   const [totalQuantity, setTotalQuantity] = useState(1);
@@ -46,25 +48,29 @@ const PurchaseModal = ({ closeModal, isOpen, plant,refetch }) => {
     setTotalQuantity(value);
     setTotalPrice(value * price);
     setPurchaseInfo((prv) => {
-      return { ...prv, quantity: value,price: value * price };
+      return { ...prv, quantity: value, price: value * price };
     });
   };
   const handlePurchase = async () => {
     // add the purchase
-    
+
     // post request to db
     try {
       // save data in db
-      await axiosSecure.post("/orders",purchaseInfo)
+      await axiosSecure.post("/orders", purchaseInfo);
       // decress quantity from plant collection
-      await axiosSecure.patch(`/plants/quantity/${_id}`,{quantityToUpdate: totalQuantity})
-      toast.success("order successful")
-      refetch()
+      await axiosSecure.patch(`/plants/quantity/${_id}`, {
+        quantityToUpdate: totalQuantity,
+        status: "decrease",
+      });
+      toast.success("order successful");
+      refetch();
+      navigate("/dashboard/my-orders");
     } catch (error) {
-      console.log(error)
-      toast.error("order unSuccessful")
-    }finally{
-      closeModal()
+      console.log(error);
+      toast.error("order unSuccessful");
+    } finally {
+      closeModal();
     }
   };
 

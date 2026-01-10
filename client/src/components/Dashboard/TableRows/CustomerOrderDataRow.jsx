@@ -1,18 +1,30 @@
 import PropTypes from 'prop-types'
 import { useState } from 'react'
 import DeleteModal from '../../Modal/DeleteModal'
-const CustomerOrderDataRow = ({orderData}) => {
+import useAxiosSecure from '../../../hooks/useAxiosSecure'
+const   CustomerOrderDataRow = ({orderData,refetch}) => {
+  const axiosSecure = useAxiosSecure()
   let [isOpen, setIsOpen] = useState(false)
   const closeModal = () => setIsOpen(false)
-  const {name,image,category,price,quantity,_id,status} = orderData;
+  const {name,image,category,price,quantity,_id,status,plantId} = orderData;
   // handle order deleted/cancelllation
 
   const handleDeleted = async () =>{
     try {
       // fetch deleted data
-      console.log(_id)
+      await axiosSecure.delete(`/orders/${_id}`)
+       // increase quantity from plant collection
+       await axiosSecure.patch(`/plants/quantity/${plantId}`, {
+        quantityToUpdate: quantity,
+        status: "increase",
+      });
+      // call refetch to refetch ui
+
+      refetch()
     } catch (error) {
       console.log(error)
+    }finally{
+      closeModal()
     }
   }
   return (
