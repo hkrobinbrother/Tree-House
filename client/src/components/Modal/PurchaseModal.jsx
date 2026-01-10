@@ -12,7 +12,7 @@ import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 
-const PurchaseModal = ({ closeModal, isOpen, plant }) => {
+const PurchaseModal = ({ closeModal, isOpen, plant,refetch }) => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure()
   const { category, description, image, price, name, seller, quantity, _id } =
@@ -46,16 +46,20 @@ const PurchaseModal = ({ closeModal, isOpen, plant }) => {
     setTotalQuantity(value);
     setTotalPrice(value * price);
     setPurchaseInfo((prv) => {
-      return { ...prv, quantity: value,price:value * price };
+      return { ...prv, quantity: value,price: value * price };
     });
   };
   const handlePurchase = async () => {
     // add the purchase
-    console.table(purchaseInfo);
+    
     // post request to db
     try {
+      // save data in db
       await axiosSecure.post("/orders",purchaseInfo)
+      // decress quantity from plant collection
+      await axiosSecure.patch(`/plants/quantity/${_id}`,{quantityToUpdate: totalQuantity})
       toast.success("order successful")
+      refetch()
     } catch (error) {
       console.log(error)
       toast.error("order unSuccessful")

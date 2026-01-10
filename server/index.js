@@ -65,7 +65,7 @@ async function run() {
       if (isExist) {
         return res.send(isExist)
       }
-      const result = await usersCollection.insertOne({ ...user,role:"customer", timestamp: Date.now() })
+      const result = await usersCollection.insertOne({ ...user, role: "customer", timestamp: Date.now() })
       res.send(result)
     })
 
@@ -100,30 +100,30 @@ async function run() {
 
 
     // save a plants in db
-    app.post("/plants",verifyToken,async(req,res)=>{
+    app.post("/plants", verifyToken, async (req, res) => {
       const plant = req.body
       const result = await plantsCollection.insertOne(plant)
       res.send(result)
     })
 
     // get all plants from db
-    app.get("/plants",async(req,res)=>{
-      
+    app.get("/plants", async (req, res) => {
+
       const result = await plantsCollection.find().limit(20).toArray()
       res.send(result)
     })
 
 
     // get a plant by Id
-    app.get("/plants/:id",async(req,res)=>{
+    app.get("/plants/:id", async (req, res) => {
       const id = req.params.id
-      const query ={_id: new ObjectId(id)}
+      const query = { _id: new ObjectId(id) }
       const result = await plantsCollection.findOne(query)
       res.send(result)
     })
 
     // save order data in db
-     app.post("/orders",verifyToken,async(req,res)=>{
+    app.post("/orders", verifyToken, async (req, res) => {
       const orderInfo = req.body
       console.log(orderInfo)
       const result = await ordersCollection.insertOne(orderInfo)
@@ -132,7 +132,68 @@ async function run() {
 
     // manage plant quantity
 
+    app.patch("/plants/quantity/:id", verifyToken, async (req, res) => {
+      const id = req.params.id
+      const { quantityToUpdate } = req.body
+      const filter = { _id: new ObjectId(id) }
+      let updateDoc = {
+        $inc: { quantity: -quantityToUpdate },
+      }
+      const result = await plantsCollection.updateOne(filter, updateDoc)
+      res.send(result)
+    })
 
+    // get all orders for a spacific cousomer order
+    app.get("/customer-orders/:email", verifyToken, async (req, res) => {
+
+      const email = req.params.email
+      const quary = { "customer.email": email }
+      const result = await ordersCollection.aggregate([
+        {
+          // match spechific coustomer data only bt email
+          $match: quary,    
+
+        },
+        {
+          $addFields: {
+            // convert plantId string field to object field 
+            plantId: { $toObjectId: "$plantId" },
+          },
+
+        },
+        {
+          $lookup: {
+            // got to a different collection and look for data
+            // collection name
+            from: "plants",
+            // local data that you want to match
+            localField: "plantId",
+            // foreign field name of the same data
+            foreignField: "_id",
+            // return that data plants array (array naming)
+            as: "plants",
+          }
+        },
+        {
+          // add these fields in order object
+          $unwind: "$plants"
+        },
+        {
+          $addFields: {
+            name: "$plants.name",
+            image: "$plants.image",
+            category: "$plants.category"
+          }
+
+        },
+        {
+          // remove plants object property from by order object 
+          $project: { plants: 0 }
+        }
+      ]).toArray()
+
+      res.send(result)
+    })
 
 
     // Send a ping to confirm a successful connection

@@ -63,7 +63,7 @@ const AuthProvider = ({ children }) => {
             name: currentUser?.displayName,
             image: currentUser?.photoURL,
             email: currentUser?.email,
-            role:"customer",
+            role:"customer"
 
           }
         );
