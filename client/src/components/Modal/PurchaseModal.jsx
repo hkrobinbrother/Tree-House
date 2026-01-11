@@ -17,7 +17,7 @@ const PurchaseModal = ({ closeModal, isOpen, plant, refetch }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
-  const { category, description, image, price, name, seller, quantity, _id } =
+  const { category,  price, name, seller, quantity, _id } =
     plant;
   const [totalQuantity, setTotalQuantity] = useState(1);
   const [totalPrice, setTotalPrice] = useState(price);

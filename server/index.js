@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const jwt = require('jsonwebtoken')
 const morgan = require('morgan')
+// const { cacheSignal } = require('react')
 
 const port = process.env.PORT || 9000
 const app = express()
@@ -67,6 +68,25 @@ async function run() {
       }
       const result = await usersCollection.insertOne({ ...user, role: "customer", timestamp: Date.now() })
       res.send(result)
+    })
+
+    // manage user status and role
+    app.patch("/users/:email", verifyToken, async(req,res)=>{
+      const email = req.params.email
+      const query = { email}
+      const user = await usersCollection.findOne(query)
+      if(!user || user?.status === "Requested") return res.status(400).send("You have already requested, wait for some time!")
+      
+      const updateDoc = {
+        $set:{
+          status: "Requested",
+        },
+      }
+
+      const result = await usersCollection.updateOne(query, updateDoc)
+      console.log(result)
+      res.send(result)
+
     })
 
     // Generate jwt token
@@ -206,7 +226,7 @@ async function run() {
       const id = req.params.id
       const quary = {_id: new ObjectId(id)}
       const order = await ordersCollection.findOne(quary)
-      if(order.status === "delivered") return res.status(409).send("Cannot cancle onece the product in delivered!")
+      if(order.status === "Delivered") return res.status(409).send("Cannot cancle onece the product in delivered!")
       const result = await ordersCollection.deleteOne(quary)
       res.send(result)
     })

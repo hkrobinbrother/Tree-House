@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { useState } from 'react'
 import DeleteModal from '../../Modal/DeleteModal'
 import useAxiosSecure from '../../../hooks/useAxiosSecure'
+import toast from 'react-hot-toast'
 const   CustomerOrderDataRow = ({orderData,refetch}) => {
   const axiosSecure = useAxiosSecure()
   let [isOpen, setIsOpen] = useState(false)
@@ -21,8 +22,10 @@ const   CustomerOrderDataRow = ({orderData,refetch}) => {
       // call refetch to refetch ui
 
       refetch()
+      toast.success("Order Cancelled.")
     } catch (error) {
       console.log(error)
+    toast.error(error.response.data)
     }finally{
       closeModal()
     }
@@ -76,7 +79,7 @@ const   CustomerOrderDataRow = ({orderData,refetch}) => {
 }
 
 CustomerOrderDataRow.propTypes = {
-  order: PropTypes.object,
+  orderData: PropTypes.object,
   refetch: PropTypes.func,
 }
 
