@@ -62,7 +62,7 @@ async function run() {
       const query = { email }
       const user = req.body
       // check if user exists in db
-      const isExist = await usersCollection.findOne()
+      const isExist = await usersCollection.findOne(query)
       if (isExist) {
         return res.send(isExist)
       }
