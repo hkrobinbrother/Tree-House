@@ -108,6 +108,9 @@ const Sidebar = () => {
             <div  className='mx-4 font-medium'>
               Logout
             </div>
+            <div  className='mx-4 font-medium'>
+              Logout
+            </div>
           </button>
         </div>
       </div>
