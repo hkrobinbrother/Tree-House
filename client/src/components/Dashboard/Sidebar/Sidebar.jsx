@@ -104,6 +104,10 @@ const Sidebar = () => {
             <GrLogout className='w-5 h-5' />
 
             {/* <span className='mx-4 font-medium'>Logout</span> */}
+
+            <div  className='mx-4 font-medium'>
+              Logout
+            </div>
           </button>
         </div>
       </div>
