@@ -89,6 +89,13 @@ async function run() {
 
     })
 
+    // get user role
+    app.get("/users/role/:email", async(req,res)=>{
+      const email = req.params.email
+      const result = await usersCollection.findOne({email})
+      res.send({role: result?.role})
+    })
+
     // Generate jwt token
     app.post('/jwt', async (req, res) => {
       const email = req.body
