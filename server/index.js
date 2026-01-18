@@ -91,8 +91,11 @@ async function run() {
 
     // get all user data
 
-    app.get("/all-users", verifyToken,async  (req,res)=>{
-      const result = await usersCollection.find().toArray()
+    app.get("/all-users/:email", verifyToken,async  (req,res)=>{
+      const email = req.params.email
+      // the admin was not to see her email in manage users 
+      const query = {email:{$ne: email}}
+      const result = await usersCollection.find(query).toArray()
       res.send(result)
     })
 
