@@ -55,6 +55,17 @@ async function run() {
     const plantsCollection = db.collection("plants")
     const ordersCollection = db.collection("orders")
 
+    // verify admin middleware
+
+    const verifyAdmin = async (req, res, next) => {
+      // console.log("data from verify token middle ware", req.user?.email)
+      const email = req.user?.email
+      const query = { email }
+      const result = await usersCollection.findOne(query)
+      if (!result || result?.role !== "admin") return res.status(403).send({ message: "Forbidden access! Admin only actions!" })
+      next()
+    }
+
     // save or update user in db
 
     app.post("/users/:email", async (req, res) => {
@@ -71,14 +82,14 @@ async function run() {
     })
 
     // manage user status and role
-    app.patch("/users/:email", verifyToken, async(req,res)=>{
+    app.patch("/users/:email", verifyToken, async (req, res) => {
       const email = req.params.email
-      const query = { email}
+      const query = { email }
       const user = await usersCollection.findOne(query)
-      if(!user || user?.status === "Requested") return res.status(400).send("You have already requested, wait for some time!")
-      
+      if (!user || user?.status === "Requested") return res.status(400).send("You have already requested, wait for some time!")
+
       const updateDoc = {
-        $set:{
+        $set: {
           status: "Requested",
         },
       }
@@ -91,33 +102,33 @@ async function run() {
 
     // get all user data
 
-    // app.get("/all-users/:email", verifyToken,async  (req,res)=>{
-    //   const email = req.params.email
-    //   // the admin was not to see her email in manage users 
-    //   const query = {email:{$ne: email}}
-    //   const result = await usersCollection.find(query).toArray()
-    //   res.send(result)
-    // })
+    app.get("/all-users/:email", verifyToken, verifyAdmin, async (req, res) => {
+      const email = req.params.email
+      // the admin was not to see her email in manage users 
+      const query = { email: { $ne: email } }
+      const result = await usersCollection.find(query).toArray()
+      res.send(result)
+    })
     // update a user role & status
 
-    app.patch("/user/role/:email", verifyToken, async(req,res)=>{
+    app.patch("/user/role/:email", verifyToken, async (req, res) => {
       const email = req.params.email
-      const {role} = req.body
-      const filter = {email}
+      const { role } = req.body
+      const filter = { email }
       const updateDoc = {
-        $set : {role,status:"Verified"},
+        $set: { role, status: "Verified" },
 
       }
-      const result = await usersCollection.updateOne(filter,updateDoc)
+      const result = await usersCollection.updateOne(filter, updateDoc)
       res.send(result)
 
     })
 
     // get user role
-    app.get("/users/role/:email", async(req,res)=>{
+    app.get("/users/role/:email", async (req, res) => {
       const email = req.params.email
-      const result = await usersCollection.findOne({email})
-      res.send({role: result?.role})
+      const result = await usersCollection.findOne({ email })
+      res.send({ role: result?.role })
     })
 
     // Generate jwt token
@@ -190,7 +201,7 @@ async function run() {
       let updateDoc = {
         $inc: { quantity: -quantityToUpdate },
       }
-      if(status === "increase"){
+      if (status === "increase") {
         updateDoc = {
           $inc: { quantity: quantityToUpdate },
         }
@@ -207,7 +218,7 @@ async function run() {
       const result = await ordersCollection.aggregate([
         {
           // match spechific coustomer data only bt email
-          $match: quary,    
+          $match: quary,
 
         },
         {
@@ -253,11 +264,11 @@ async function run() {
 
 
     // cancle/deleted order
-    app.delete("/orders/:id" ,verifyToken,async(req,res)=>{
+    app.delete("/orders/:id", verifyToken, async (req, res) => {
       const id = req.params.id
-      const quary = {_id: new ObjectId(id)}
+      const quary = { _id: new ObjectId(id) }
       const order = await ordersCollection.findOne(quary)
-      if(order.status === "Delivered") return res.status(409).send("Cannot cancle onece the product in delivered!")
+      if (order.status === "Delivered") return res.status(409).send("Cannot cancle onece the product in delivered!")
       const result = await ordersCollection.deleteOne(quary)
       res.send(result)
     })
