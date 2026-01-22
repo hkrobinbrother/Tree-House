@@ -69,7 +69,7 @@ async function run() {
     // verify seller middleware
     const verifySeller = async (req, res, next) => {
       const email = req.user?.email
-      const query = { email } 
+      const query = { email }
       const result = await usersCollection.findOne(query)
       if (!result || result?.role !== "seller") return res.status(403).send({ message: "Forbidden access! Seller only actions!" })
       next()
@@ -120,7 +120,7 @@ async function run() {
     })
     // update a user role & status
 
-    app.patch("/user/role/:email", verifyToken, async (req, res) => {
+    app.patch("/user/role/:email", verifyToken, verifyAdmin, async (req, res) => {
       const email = req.params.email
       const { role } = req.body
       const filter = { email }
@@ -131,6 +131,24 @@ async function run() {
       const result = await usersCollection.updateOne(filter, updateDoc)
       res.send(result)
 
+    })
+
+    // get inventory data for sellers
+
+    app.get("/plants/seller", verifyToken, verifySeller, async (req, res) => {
+      const email = req.user.email
+
+      const result = await plantsCollection.find({ "seller.email": email }).toArray()
+      res.send(result)
+    })
+
+    // deleted a plant from db by seller
+    app.delete("/plants/:id", verifyToken, verifySeller, async (req, res) => {
+      console.log("deleted hit")
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) }
+      const result = await plantsCollection.deleteOne(query)
+      res.send(result)
     })
 
     // get user role
