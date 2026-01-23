@@ -290,6 +290,72 @@ async function run() {
     })
 
 
+
+     // get all orders for a spacific seller
+    app.get("/seller-orders/:email", verifyToken,verifySeller, async (req, res) => {
+
+      const email = req.params.email
+      const quary = { seller: email }
+      const result = await ordersCollection.aggregate([
+        {
+          // match spechific coustomer data only bt email
+          $match: quary,
+
+        },
+        {
+          $addFields: {
+            // convert plantId string field to object field 
+            plantId: { $toObjectId: "$plantId" },
+          },
+
+        },
+        {
+          $lookup: {
+            // got to a different collection and look for data
+            // collection name
+            from: "plants",
+            // local data that you want to match
+            localField: "plantId",
+            // foreign field name of the same data
+            foreignField: "_id",
+            // return that data plants array (array naming)
+            as: "plants",
+          }
+        },
+        {
+          // add these fields in order object
+          $unwind: "$plants"
+        },
+        {
+          $addFields: {
+            name: "$plants.name",
+            
+          }
+
+        },
+        {
+          // remove plants object property from by order object 
+          $project: { plants: 0 }
+        }
+      ]).toArray()
+
+      res.send(result)
+    })
+
+    // update order status
+    app.patch("/orders/:id", verifyToken, verifySeller
+      , async (req, res) => {
+      const id = req.params.id
+      const { status } = req.body
+      const filter = { _id: new ObjectId(id) }
+      const updateDoc = {
+        $set: { status },
+
+      }
+      const result = await ordersCollection.updateOne(filter, updateDoc)
+      res.send(result)
+
+    })
     // cancle/deleted order
     app.delete("/orders/:id", verifyToken, async (req, res) => {
       const id = req.params.id
