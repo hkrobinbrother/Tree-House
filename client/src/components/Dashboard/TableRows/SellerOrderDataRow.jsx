@@ -34,7 +34,16 @@ const SellerOrderDataRow = ({orderData,refetch}) => {
 
   const handleStatus = async newStatus => {
     if(status === newStatus) return;
-    console.log(newStatus)
+    try {
+      await axiosSecure.patch(`/orders/${_id}`, {
+         status: newStatus });
+      toast.success("Order status updated.")
+      refetch()   
+    } catch (error) {
+      console.log(error)
+      toast.error("Failed to update order status.")
+    }
+    // console.log(newStatus)
     // patch request to server
   } 
 

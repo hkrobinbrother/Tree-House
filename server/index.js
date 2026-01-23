@@ -343,8 +343,7 @@ async function run() {
     })
 
     // update order status
-    app.patch("/orders/:id", verifyToken, verifySeller
-      , async (req, res) => {
+    app.patch("/orders/:id", verifyToken, verifySeller , async (req, res) => {
       const id = req.params.id
       const { status } = req.body
       const filter = { _id: new ObjectId(id) }
