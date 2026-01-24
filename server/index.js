@@ -64,7 +64,7 @@ const mailBody =
     from:  process.env.NODEMAILER_USER,
     to: emailAddress,
     subject:emailData?.subject,
-   
+    message:emailData?.message,
     html:`<p>${emailData?.message}</p>`, // HTML version of the message
   }
   // send mail
@@ -72,7 +72,7 @@ transporter.sendMail(mailBody,(error,info)=>{
   if(error){
     console.log("Email sending error",error)
   }else{
-    console.log(info)
+    
     console.log("Email sent successfully",info?.response)
   }
 })
@@ -258,6 +258,19 @@ async function run() {
       const orderInfo = req.body
       console.log(orderInfo)
       const result = await ordersCollection.insertOne(orderInfo)
+      // send email
+      if(result?.insertedId){
+        // to customer email
+        sendEmail(orderInfo?.customer?.email,{
+          subject:"Order Placed Successfully!",
+          message:`You've placed an order successfully . Your order ID is ${result?.insertedId}`
+        })
+        // to seller email
+        sendEmail(orderInfo?.seller,{
+          subject:"New Order Received!",
+          message:`You have a new order. Order ID is ${result?.insertedId}. and ${orderInfo?.customer?.name}  Please check your seller dashboard to process the order.`
+        })
+      }
       res.send(result)
     })
 
