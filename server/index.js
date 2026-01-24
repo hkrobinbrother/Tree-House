@@ -4,6 +4,7 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const jwt = require('jsonwebtoken')
+const nodemailer = require("nodemailer");
 const morgan = require('morgan')
 // const { cacheSignal } = require('react')
 
@@ -35,6 +36,46 @@ const verifyToken = async (req, res, next) => {
     req.user = decoded
     next()
   })
+}
+
+// send email using nodemailer
+const sendEmail = (emailAddress,emailData)=>{
+  // create transporter
+  const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, // Use true for port 465, false for port 587
+  auth: {
+    user: process.env.NODEMAILER_USER,
+    pass: process.env.NODEMAILER_PASS,
+  },
+});
+// verify connection
+transporter.verify((error,success )=> {
+  if(error){
+    console.log("Email transporter error",error)
+  }else{
+    console.log("Transporter is ready to email",success)
+  }
+})
+// transporter send mail
+const mailBody = 
+  {
+    from:  process.env.NODEMAILER_USER,
+    to: emailAddress,
+    subject:emailData?.subject,
+   
+    html:`<p>${emailData?.message}</p>`, // HTML version of the message
+  }
+  // send mail
+transporter.sendMail(mailBody,(error,info)=>{
+  if(error){
+    console.log("Email sending error",error)
+  }else{
+    console.log(info)
+    console.log("Email sent successfully",info?.response)
+  }
+})
 }
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.d1icoll.mongodb.net/?appName=Cluster0`;
@@ -78,6 +119,7 @@ async function run() {
     // save or update user in db
 
     app.post("/users/:email", async (req, res) => {
+      sendEmail()
       const email = req.params.email
       const query = { email }
       const user = req.body
