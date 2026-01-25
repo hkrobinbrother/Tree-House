@@ -91,10 +91,10 @@ const client = new MongoClient(uri, {
 })
 async function run() {
   try {
-    const db = client.db("treeHouse-session")
-    const usersCollection = db.collection("users")
-    const plantsCollection = db.collection("plants")
-    const ordersCollection = db.collection("orders")
+    // const db = client.db("treeHouse-session")
+    // const usersCollection = db.collection("users")
+    // const plantsCollection = db.collection("plants")
+    // const ordersCollection = db.collection("orders")
 
     // verify admin middleware
 
