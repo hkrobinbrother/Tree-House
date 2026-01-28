@@ -90,11 +90,11 @@ const client = new MongoClient(uri, {
   },
 })
 async function run() {
-  // try {
-  //   const db = client.db("treeHouse-session")
-  //   const usersCollection = db.collection("users")
-  //   const plantsCollection = db.collection("plants")
-  //   const ordersCollection = db.collection("orders")
+  try {
+    const db = client.db("treeHouse-session")
+    const usersCollection = db.collection("users")
+    const plantsCollection = db.collection("plants")
+    const ordersCollection = db.collection("orders")
 
     // verify admin middleware
 
@@ -418,6 +418,32 @@ async function run() {
       if (order.status === "Delivered") return res.status(409).send("Cannot cancle onece the product in delivered!")
       const result = await ordersCollection.deleteOne(quary)
       res.send(result)
+    })
+
+    // admin statistics
+    app.get("/admin-stat",verifyToken,verifyAdmin, async(req,res)=>{
+      // get total users,total plants
+      const totalUsers  = await usersCollection.countDocuments()
+      const totalPlants  = await plantsCollection.estimatedDocumentCount()
+
+      const allOrder = await ordersCollection.find().toArray()  
+      // const totalOrders = allOrder.length
+      // const totalPrice = allOrder.reduce((sum,order)=> sum + order.price ,0)   
+      
+      // get total revenue and total orders
+      const ordersDetails = await ordersCollection.aggregate([
+        {
+          $group:{
+            _id:null,
+            totalRevenue:{$sum:"$price"},
+            totalOrders:{ $sum:1}
+          },
+        },
+        { $project:{_id:0}}
+      ]).next()
+      
+      res.send({totalUsers,totalPlants,...ordersDetails})
+
     })
 
     // Send a ping to confirm a successful connection
