@@ -4,6 +4,7 @@ import { BsFillCartPlusFill, BsFillHouseDoorFill } from "react-icons/bs";
 import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import LoadingSpinner from "../../Shared/LoadingSpinner";
+import Chart from "../Charts/Chart";
 
 const AdminStatistics = () => {
   const axiosSecure = useAxiosSecure();
@@ -16,7 +17,7 @@ const AdminStatistics = () => {
     },
   });
   const {totalPlants,totalUsers,totalRevenue,totalOrders} = statData || {};
-  console.log(statData)
+ 
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -95,7 +96,7 @@ const AdminStatistics = () => {
         <div className="mb-4 grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
           {/*Sales Bar Chart */}
           <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md overflow-hidden xl:col-span-2">
-            {/* Chart goes here.. */}
+            <Chart />
           </div>
           {/* Calender */}
           <div className=" relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md overflow-hidden">
