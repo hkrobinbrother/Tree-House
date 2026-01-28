@@ -39,43 +39,43 @@ const verifyToken = async (req, res, next) => {
 }
 
 // send email using nodemailer
-const sendEmail = (emailAddress,emailData)=>{
+const sendEmail = (emailAddress, emailData) => {
   // create transporter
   const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // Use true for port 465, false for port 587
-  auth: {
-    user: process.env.NODEMAILER_USER,
-    pass: process.env.NODEMAILER_PASS,
-  },
-});
-// verify connection
-transporter.verify((error,success )=> {
-  if(error){
-    console.log("Email transporter error",error)
-  }else{
-    console.log("Transporter is ready to email",success)
-  }
-})
-// transporter send mail
-const mailBody = 
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // Use true for port 465, false for port 587
+    auth: {
+      user: process.env.NODEMAILER_USER,
+      pass: process.env.NODEMAILER_PASS,
+    },
+  });
+  // verify connection
+  transporter.verify((error, success) => {
+    if (error) {
+      console.log("Email transporter error", error)
+    } else {
+      console.log("Transporter is ready to email", success)
+    }
+  })
+  // transporter send mail
+  const mailBody =
   {
-    from:  process.env.NODEMAILER_USER,
+    from: process.env.NODEMAILER_USER,
     to: emailAddress,
-    subject:emailData?.subject,
-    message:emailData?.message,
-    html:`<p>${emailData?.message}</p>`, // HTML version of the message
+    subject: emailData?.subject,
+    message: emailData?.message,
+    html: `<p>${emailData?.message}</p>`, // HTML version of the message
   }
   // send mail
-transporter.sendMail(mailBody,(error,info)=>{
-  if(error){
-    console.log("Email sending error",error)
-  }else{
-    
-    console.log("Email sent successfully",info?.response)
-  }
-})
+  transporter.sendMail(mailBody, (error, info) => {
+    if (error) {
+      console.log("Email sending error", error)
+    } else {
+
+      console.log("Email sent successfully", info?.response)
+    }
+  })
 }
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.d1icoll.mongodb.net/?appName=Cluster0`;
@@ -259,16 +259,16 @@ async function run() {
       console.log(orderInfo)
       const result = await ordersCollection.insertOne(orderInfo)
       // send email
-      if(result?.insertedId){
+      if (result?.insertedId) {
         // to customer email
-        sendEmail(orderInfo?.customer?.email,{
-          subject:"Order Placed Successfully!",
-          message:`You've placed an order successfully . Your order ID is ${result?.insertedId}`
+        sendEmail(orderInfo?.customer?.email, {
+          subject: "Order Placed Successfully!",
+          message: `You've placed an order successfully . Your order ID is ${result?.insertedId}`
         })
         // to seller email
-        sendEmail(orderInfo?.seller,{
-          subject:"New Order Received!",
-          message:`You have a new order. Order ID is ${result?.insertedId}. and ${orderInfo?.customer?.name}  Please check your seller dashboard to process the order.`
+        sendEmail(orderInfo?.seller, {
+          subject: "New Order Received!",
+          message: `You have a new order. Order ID is ${result?.insertedId}. and ${orderInfo?.customer?.name}  Please check your seller dashboard to process the order.`
         })
       }
       res.send(result)
@@ -346,8 +346,8 @@ async function run() {
 
 
 
-     // get all orders for a spacific seller
-    app.get("/seller-orders/:email", verifyToken,verifySeller, async (req, res) => {
+    // get all orders for a spacific seller
+    app.get("/seller-orders/:email", verifyToken, verifySeller, async (req, res) => {
 
       const email = req.params.email
       const quary = { seller: email }
@@ -384,7 +384,7 @@ async function run() {
         {
           $addFields: {
             name: "$plants.name",
-            
+
           }
 
         },
@@ -398,7 +398,7 @@ async function run() {
     })
 
     // update order status
-    app.patch("/orders/:id", verifyToken, verifySeller , async (req, res) => {
+    app.patch("/orders/:id", verifyToken, verifySeller, async (req, res) => {
       const id = req.params.id
       const { status } = req.body
       const filter = { _id: new ObjectId(id) }
@@ -421,28 +421,51 @@ async function run() {
     })
 
     // admin statistics
-    app.get("/admin-stat",verifyToken,verifyAdmin, async(req,res)=>{
+    app.get("/admin-stat", verifyToken, verifyAdmin, async (req, res) => {
       // get total users,total plants
-      const totalUsers  = await usersCollection.countDocuments()
-      const totalPlants  = await plantsCollection.estimatedDocumentCount()
+      const totalUsers = await usersCollection.countDocuments()
+      const totalPlants = await plantsCollection.estimatedDocumentCount()
 
-      const allOrder = await ordersCollection.find().toArray()  
+      const allOrder = await ordersCollection.find().toArray()
       // const totalOrders = allOrder.length
       // const totalPrice = allOrder.reduce((sum,order)=> sum + order.price ,0)   
-      
+
+      // generate chart data
+      const chartData = await ordersCollection.aggregate([
+        {
+          $group: {
+            _id: { $dateToString: { format: "%Y-%m-%d", date: { $toDate: "$_id" } } },
+            quantity: { $sum: "$quantity" },
+            price: { $sum: "$price" },
+            order: { $sum: 1 }
+          },
+        },
+        {
+          $project:{
+            _id:0,
+            date:"$_id",
+            quantity:1,
+            order:1,
+            price:1
+          }
+        }
+      ]).next()
+
+     
+
       // get total revenue and total orders
       const ordersDetails = await ordersCollection.aggregate([
         {
-          $group:{
-            _id:null,
-            totalRevenue:{$sum:"$price"},
-            totalOrders:{ $sum:1}
+          $group: {
+            _id: null,
+            totalRevenue: { $sum: "$price" },
+            totalOrders: { $sum: 1 }
           },
         },
-        { $project:{_id:0}}
+        { $project: { _id: 0 } }
       ]).next()
-      
-      res.send({totalUsers,totalPlants,...ordersDetails})
+
+      res.send({ totalUsers, totalPlants, ...ordersDetails, chartData })
 
     })
 
