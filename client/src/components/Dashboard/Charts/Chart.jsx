@@ -27,13 +27,13 @@ const Chart = ({ isAnimationActive = true ,chartData}) => {
           <Tooltip />
           <Legend />
 
-          <Area
+          {/* <Area
             type="monotone"
             dataKey="order"
             fill="#8884d8"
             stroke="#8884d8"
             isAnimationActive={isAnimationActive}
-          />
+          /> */}
 
           <Bar
             dataKey="price"
