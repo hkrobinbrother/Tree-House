@@ -12,7 +12,9 @@ import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { useNavigate } from "react-router-dom";
-
+import {CheckoutProvider} from '@stripe/react-stripe-js/checkout';
+import {loadStripe} from '@stripe/stripe-js';
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 const PurchaseModal = ({ closeModal, isOpen, plant, refetch }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -148,7 +150,7 @@ const PurchaseModal = ({ closeModal, isOpen, plant, refetch }) => {
 
                 <div className="space-x-2 text-sm mt-2">
                   <label htmlFor="address" className=" text-gray-600">
-                    Quantity :
+                    Address :
                   </label>
                   <input
                     className=" p-2 text-gray-800 border border-lime-300 focus:outline-lime-500 rounded-md bg-white"
