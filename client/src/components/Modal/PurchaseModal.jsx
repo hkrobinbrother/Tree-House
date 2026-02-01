@@ -12,8 +12,10 @@ import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { useNavigate } from "react-router-dom";
-import {CheckoutProvider} from '@stripe/react-stripe-js/checkout';
+
 import {loadStripe} from '@stripe/stripe-js';
+import { Elements } from "@stripe/react-stripe-js";
+import CheckoutForm from "../Form/CheckOutForm";
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 const PurchaseModal = ({ closeModal, isOpen, plant, refetch }) => {
   const navigate = useNavigate();
@@ -166,13 +168,13 @@ const PurchaseModal = ({ closeModal, isOpen, plant, refetch }) => {
                     required
                   />
                 </div>
+                {/* checkOut From */}
+                <Elements stripe={stripePromise}>
+                  {/* from components */}
+                  <CheckoutForm closeModal={closeModal} purchaseInfo={purchaseInfo} refetch={refetch} />
+                </Elements>
 
-                <div className="mt-3 ">
-                  <Button
-                    onClick={handlePurchase}
-                    label={`pay ${totalPrice}$`}
-                  />
-                </div>
+                
               </DialogPanel>
             </TransitionChild>
           </div>

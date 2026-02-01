@@ -469,6 +469,15 @@ async function run() {
 
     })
 
+    // create payment intent
+    app.post("/create-payment-intent", verifyToken, async (req, res) => {
+      const { quantity,plantId } = req.body
+      const plant  = await plantsCollection.findOne({ _id: new ObjectId(plantId) })
+      if(!plant){
+        return res.status(404).send({message:"Plant not found!"})
+      }
+    })
+
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 })
     console.log(
