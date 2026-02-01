@@ -171,7 +171,7 @@ const PurchaseModal = ({ closeModal, isOpen, plant, refetch }) => {
                 {/* checkOut From */}
                 <Elements stripe={stripePromise}>
                   {/* from components */}
-                  <CheckoutForm closeModal={closeModal} purchaseInfo={purchaseInfo} refetch={refetch} />
+                  <CheckoutForm closeModal={closeModal} purchaseInfo={purchaseInfo} refetch={refetch} totalQuantity={totalQuantity} />
                 </Elements>
 
                 

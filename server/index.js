@@ -5,6 +5,8 @@ const cookieParser = require('cookie-parser')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const jwt = require('jsonwebtoken')
 const nodemailer = require("nodemailer");
+const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY);
+
 const morgan = require('morgan')
 // const { cacheSignal } = require('react')
 
@@ -441,17 +443,17 @@ async function run() {
           },
         },
         {
-          $project:{
-            _id:0,
-            date:"$_id",
-            quantity:1,
-            order:1,
-            price:1
+          $project: {
+            _id: 0,
+            date: "$_id",
+            quantity: 1,
+            order: 1,
+            price: 1
           }
         }
       ]).next()
 
-     
+
 
       // get total revenue and total orders
       const ordersDetails = await ordersCollection.aggregate([
@@ -471,11 +473,33 @@ async function run() {
 
     // create payment intent
     app.post("/create-payment-intent", verifyToken, async (req, res) => {
-      const { quantity,plantId } = req.body
-      const plant  = await plantsCollection.findOne({ _id: new ObjectId(plantId) })
-      if(!plant){
-        return res.status(404).send({message:"Plant not found!"})
+      const { quantity, plantId } = req.body
+      const plant = await plantsCollection.findOne({ _id: new ObjectId(plantId) })
+      if (!plant) {
+        return res.status(404).send({ message: "Plant not found!" })
       }
+
+      const price = Number(plant.price);
+      const qty = Number(quantity);
+
+      if (isNaN(price) || isNaN(qty)) {
+        return res.status(400).send({
+          message: "Invalid price or quantity",
+        });
+      }
+
+      const totalPrice = Math.round(price * qty * 100);
+      // in cents
+      const { client_secret } = await stripe.paymentIntents.create({
+        amount: totalPrice,
+        currency: 'usd',
+        automatic_payment_methods: {
+          enabled: true,
+        },
+      });
+      res.send({
+        clientSecret: client_secret
+      })
     })
 
     // Send a ping to confirm a successful connection
