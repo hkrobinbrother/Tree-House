@@ -12,15 +12,13 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+const Chart = ({ isAnimationActive = true, chartData }) => {
+  
 
-const Chart = ({ isAnimationActive = true ,chartData}) => {
-   
-    
-  console.log(chartData)
   return (
     <div style={{ width: "100%", height: 400 }}>
       <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={[chartData]}>
+        <ComposedChart data={chartData}>
           <CartesianGrid stroke="#f5f5f5" />
           <XAxis dataKey="date" />
           <YAxis />

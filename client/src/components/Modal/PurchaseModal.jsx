@@ -7,20 +7,19 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 import { Fragment, useState } from "react";
-import Button from "../Shared/Button/Button";
+
 import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
-import useAxiosSecure from "../../hooks/useAxiosSecure";
-import { useNavigate } from "react-router-dom";
+
 
 import {loadStripe} from '@stripe/stripe-js';
 import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "../Form/CheckOutForm";
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 const PurchaseModal = ({ closeModal, isOpen, plant, refetch }) => {
-  const navigate = useNavigate();
+
   const { user } = useAuth();
-  const axiosSecure = useAxiosSecure();
+  
   const { category,  price, name, seller, quantity, _id } =
     plant;
   const [totalQuantity, setTotalQuantity] = useState(1);
@@ -55,28 +54,7 @@ const PurchaseModal = ({ closeModal, isOpen, plant, refetch }) => {
       return { ...prv, quantity: value, price: value * price };
     });
   };
-  const handlePurchase = async () => {
-    // add the purchase
-
-    // post request to db
-    try {
-      // save data in db
-      await axiosSecure.post("/orders", purchaseInfo);
-      // decress quantity from plant collection
-      await axiosSecure.patch(`/plants/quantity/${_id}`, {
-        quantityToUpdate: totalQuantity,
-        status: "decrease",
-      });
-      toast.success("order successful");
-      refetch();
-      navigate("/dashboard/my-orders");
-    } catch (error) {
-      console.log(error);
-      toast.error("order unSuccessful");
-    } finally {
-      closeModal();
-    }
-  };
+  
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
