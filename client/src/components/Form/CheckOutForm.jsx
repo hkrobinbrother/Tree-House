@@ -5,7 +5,7 @@
 import PropTypes from "prop-types";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 
-import "./CheckoutForm.css";
+
 import Button from "../Shared/Button/Button";
 import { useEffect, useState } from "react";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
