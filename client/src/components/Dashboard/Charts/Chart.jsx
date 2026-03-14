@@ -13,7 +13,7 @@ import {
 } from "recharts";
 
 const Chart = ({ isAnimationActive = true, chartData }) => {
-  
+  console.log(chartData)
 
   return (
     <div style={{ width: "100%", height: 400 }}>

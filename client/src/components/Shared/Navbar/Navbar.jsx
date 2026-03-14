@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import useAuth from '../../../hooks/useAuth'
 import avatarImg from '../../../assets/images/placeholder.jpg'
 import logo from "../../../../public/logo-square.png"
+
 const Navbar = () => {
   const { user, logOut } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
